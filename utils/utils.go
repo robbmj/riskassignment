@@ -1,14 +1,13 @@
-
 package utils
 
 import (
-	"os"
-	"io"
-	"github.com/robbmj/riskassignment/threat"
-	"strings"
-	"strconv"
 	"bufio"
 	"fmt"
+	"github.com/robbmj/riskassignment/threat"
+	"io"
+	"os"
+	"strconv"
+	"strings"
 )
 
 func ReadFile(lifeTime float64) threat.Threats {
@@ -16,7 +15,7 @@ func ReadFile(lifeTime float64) threat.Threats {
 	file, _ := os.Open("data.csv")
 	reader := bufio.NewReader(file)
 	line, err := reader.ReadString('\n')
- 	
+
 	threats := make(threat.Threats, 0)
 
 	for i := 0; err != io.EOF; i++ {
@@ -54,7 +53,7 @@ func WriteMyAssignment() string {
 		<h4>Questions 1 &amp; 2: Calculate SLE, ALE, ROI</h4>`
 
 	threats := ReadFile(3.0)
-	threats.Sort()
+	threats.SortBy(threat.ByName{})
 	html += MakeTable(&threats)
 	html += "<br><h4>Question 3: Controls which should be purchased by the company</h4>"
 	html += `<p>Controls With a positive ROI will save the company money over a three year period.
@@ -91,8 +90,8 @@ func WriteMyAssignment() string {
 	}
 
 	html += "</div></body></html>"
-	return html 
-	
+	return html
+
 }
 
 func WriteOut(html string) {
@@ -137,7 +136,7 @@ func tableBody(threats *threat.Threats) string {
 		tableRow := `<tr><td>%s</td><td>%.02f</td><td>%.02f</td><td>%.02f</td><td>%.02f</td>
 					 <td>%.02f</td><td>%.02f</td><td>%.02f</td></tr>`
 
-		html += fmt.Sprintf(tableRow, threat.Name, threat.AssetValue, threat.ExposureFactor, threat.RateOfOcurance, 
+		html += fmt.Sprintf(tableRow, threat.Name, threat.AssetValue, threat.ExposureFactor, threat.RateOfOcurance,
 			threat.OneTimeCost,
 			threat.SingleLossExpectancy(),
 			threat.AnnualizedLossExpectancy(),
@@ -149,4 +148,3 @@ func tableBody(threats *threat.Threats) string {
 func closeTable() string {
 	return "</table>"
 }
-

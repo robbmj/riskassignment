@@ -1,17 +1,15 @@
-
 package threat
 
 import (
 	"sort"
-	//"fmt"
 )
 
 type Threat struct {
-	Name           string
-	AssetValue     float64
-	ExposureFactor float64
-	RateOfOcurance float64
-	OneTimeCost    float64
+	Name              string
+	AssetValue        float64
+	ExposureFactor    float64
+	RateOfOcurance    float64
+	OneTimeCost       float64
 	LifeTimeOfControl float64
 }
 
@@ -25,6 +23,10 @@ type ByAnnualizedLossExpectancy struct {
 	Threats
 }
 
+type ByName struct {
+	Threats
+}
+
 func (t Threat) SingleLossExpectancy() float64 {
 	return float64(t.AssetValue * t.ExposureFactor)
 }
@@ -34,11 +36,7 @@ func (t Threat) AnnualizedLossExpectancy() float64 {
 }
 
 func (t Threat) ReturnOnInvestment() float64 {
-	return 100 * ((t.LifeTimeOfControl * t.AnnualizedLossExpectancy() - t.OneTimeCost) / t.OneTimeCost)
-}
-
-func (ts *Threats) Sort() {
-	sort.Sort(*ts)
+	return 100 * ((t.LifeTimeOfControl*t.AnnualizedLossExpectancy() - t.OneTimeCost) / t.OneTimeCost)
 }
 
 func (ts *Threats) SortBy(by interface{}) {
@@ -47,6 +45,8 @@ func (ts *Threats) SortBy(by interface{}) {
 		sort.Sort(ByAnnualizedLossExpectancy{*ts})
 	case ByReturnOnInvestment:
 		sort.Sort(ByReturnOnInvestment{*ts})
+	case ByName:
+		sort.Sort(ByName{*ts})
 	}
 }
 
@@ -62,14 +62,17 @@ func (ts Threats) Swap(i, j int) {
 	ts[i], ts[j] = ts[j], ts[i]
 }
 
-func (ts Threats) Less(i, j int) bool {
-	return ts[i].Name < ts[j].Name
+// Less is Less
+func (t ByName) Less(i, j int) bool {
+	return t.Threats[i].Name < t.Threats[j].Name
 }
 
+// Less is really More
 func (t ByReturnOnInvestment) Less(i, j int) bool {
 	return t.Threats[i].ReturnOnInvestment() > t.Threats[j].ReturnOnInvestment()
 }
 
+// Less is really More
 func (t ByAnnualizedLossExpectancy) Less(i, j int) bool {
 	return t.Threats[i].AnnualizedLossExpectancy() > t.Threats[j].AnnualizedLossExpectancy()
 }
@@ -97,7 +100,7 @@ func (ts *Threats) DeterminBestPurchases(budget float64, by interface{}) (Threat
 	totalCost, totalROI, totalSavings, lifeTime := 0.0, 0.0, 0.0, 0.0
 
 	for _, threat := range *ts {
-		if totalCost + threat.OneTimeCost <= budget {
+		if totalCost+threat.OneTimeCost <= budget {
 
 			totalCost += threat.OneTimeCost
 			totalROI += threat.ReturnOnInvestment()
