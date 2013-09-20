@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	utils.WriteMyAssignment()
+	assignment := utils.WriteMyAssignment()
+	utils.WriteOut(assignment)
 }
 
 func devFunction() {

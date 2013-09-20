@@ -41,7 +41,7 @@ func ReadFile(lifeTime float64) threat.Threats {
 	return threats
 }
 
-func WriteMyAssignment() {
+func WriteMyAssignment() string {
 	html :=
 		`
 	<!DOCTYPE html>
@@ -90,7 +90,9 @@ func WriteMyAssignment() {
 		line, err = reader.ReadString('\n')
 	}
 
-	WriteOut(html)
+	html += "</div></body></html>"
+	return html 
+	
 }
 
 func WriteOut(html string) {
